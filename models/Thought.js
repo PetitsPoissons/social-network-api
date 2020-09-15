@@ -1,4 +1,5 @@
 const  { Schema, model } = require('mongoose');
+const moment = require('moment');
 
 const ThoughtSchema = new Schema({
   thoughtText: {
@@ -16,4 +17,8 @@ const ThoughtSchema = new Schema({
     required: true
   },
   reactions: []
-})
+});
+
+const Thought = model('Thought', ThoughtSchema);
+
+module.exports = Thought;

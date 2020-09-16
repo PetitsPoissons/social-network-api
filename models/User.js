@@ -17,7 +17,8 @@ const UserSchema = new Schema(
     },
     userCreated: {
       type: Date,
-      default: Date.now
+      default: Date.now,
+      get: (createdAtVal) => moment(createdAtVal).format('MMM DD, YYYY [at] hh:mm a')
     },
     thoughts: [
       {
@@ -34,7 +35,8 @@ const UserSchema = new Schema(
   },
   {
     toJSON: {
-      virtuals: true
+      virtuals: true,
+      getters: true
     },
     id: false   // we don't need mongoose to automatically assign an id to the virtuals we are creating
   }

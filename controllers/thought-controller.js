@@ -31,7 +31,7 @@ const thoughtController = {
     });
   },
 
-  // create thought and add it to user - POST /api/thoughts/:userId
+  // create thought and add it to a user - POST /api/thoughts/:userId
   addThought({ params, body }, res) {
     Thought.create(body)
     .then(({ _id }) => {        // pass the _id of the newly created thought
@@ -39,7 +39,8 @@ const thoughtController = {
         { _id: params.userId },
         { $push: { thoughts: _id } },
         { new: true }   // b/c we want to return the updated user data
-      );
+      )
+      .select('-__v');
     })
     .then(dbUserData => {
       if (!dbUserData) {
@@ -51,6 +52,36 @@ const thoughtController = {
     .catch(err => res.json(err));
   },
 
+  // update a thought with a newly created reaction - POST /api/thoughts/:thoughtId/reactions
+  addReaction({ params, body }, res) {
+    Thought.findOneAndUpdate(
+      { _id: params.thoughtId },
+      { $push: { reactions: body } },
+      { new: true }
+    )
+    .select('-__v')
+    .then(dbThoughtData => {
+      if (!dbThoughtData) {
+        res.status(404).json({ message: 'No thought found with this id' });
+        return;
+      }
+      res.json(dbThoughtData);
+    })
+    .catch(err => res.json(err));
+  },
+
+  // update a thought with a newly deleted reaction - DELETE /api/thoughts/:thoughtId/reactions/:reactionId
+  removeReaction({ params }, res) {
+    Thought.findOneAndUpdate(
+      { _id: params.thoughtId },
+      { $pull: { reactions: { reactionId: params.reactionId } } },
+      { new: true }
+    )
+    .select('-__v')
+    .then(dbThoughtData => res.json(dbThoughtData))
+    .catch(err => res.json(err));
+  },
+
   // update thought - PUT /api/thoughts/:id
   updateThought({ params, body }, res) {
     Thought.findOneAndUpdate(
@@ -58,6 +89,7 @@ const thoughtController = {
       body,
       { new: true }
     )
+    .select('-__v')
     .then(dbThoughtData => {
       if (!dbThoughtData) {
         res.status(404).json({ message: 'No user found with this id' });
@@ -79,7 +111,8 @@ const thoughtController = {
         { _id: params.userId },
         { $pull: { thoughts: params.thoughtId } },
         { new: true }
-      );
+      )
+      .select('-__v');
     })
     .then(dbUserData => {
       if (!dbUserData) {

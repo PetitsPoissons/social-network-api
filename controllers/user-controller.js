@@ -53,6 +53,7 @@ const userController = {
       body,
       { new: true }
     )
+    .select('-__v')
     .then(dbUserData => {
       if (!dbUserData) {
         res.status(404).json({ message: 'No user found with this id' });
@@ -66,6 +67,7 @@ const userController = {
   // delete a user - DELETE /api/users/:id
   deleteUser({ params }, res) {
     User.findOneAndDelete({ _id: params.id })
+    .select('-__v')
     .then(dbUserData => {
       if (!dbUserData) {
         res.status(404).json({ message: 'No user found with this id' });

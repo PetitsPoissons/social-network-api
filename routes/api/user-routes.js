@@ -13,7 +13,7 @@ router.route('/:id')
   .delete(deleteUser);
 
 // set PUT at /api/users/:userId/friends/:friendsId
-router.route('/:userId/friends/:friendsId')
+router.route('/:userId/friends/:friendId')
   .put(addFriend);
 
 module.exports = router;

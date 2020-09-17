@@ -48,6 +48,7 @@ const userController = {
 
   // add a new friend to a user's friend list - POST /api/users/:userId/friends/:friendId
   addFriend({ params }, res) {
+    console.log(params.friendId);
     User.findOneAndUpdate(
       { _id: params.userId },
       { $push: { friends: params.friendId } },

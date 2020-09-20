@@ -1,31 +1,32 @@
-const  { Schema, model, Types } = require('mongoose');
-const moment = require('moment');
+const { Schema, model, Types } = require("mongoose");
+const moment = require("moment");
 
 const ReactionSchema = new Schema(
   {
     reactionId: {
       type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId()
+      default: () => new Types.ObjectId(),
     },
     reactionBody: {
       type: String,
       required: true,
-      maxlength: [280, 'maximum of 280 characters allowed']
+      maxlength: [280, "maximum of 280 characters allowed"],
     },
     username: {
       type: String,
-      required: true
+      required: true,
     },
     createdAt: {
       type: Date,
       default: Date.now,
-      get: (createdAtVal) => moment(createdAtVal).format('MMM DD, YYYY [at] hh:mm a')
-    }
+      get: (createdAtVal) =>
+        moment(createdAtVal).format("MMM DD, YYYY [at] hh:mm a"),
+    },
   },
   {
     toJSON: {
-      getters: true
-    }
+      getters: true,
+    },
   }
 );
 
@@ -34,34 +35,35 @@ const ThoughtSchema = new Schema(
     thoughtText: {
       type: String,
       required: true,
-      minlength: [1, 'at least one character is required'],
-      maxlength: [280, 'maximum of 280 characters allowed']
+      minlength: [1, "at least one character is required"],
+      maxlength: [280, "maximum of 280 characters allowed"],
     },
     createdAt: {
       type: Date,
       default: Date.now,
-      get: (createdAtVal) => moment(createdAtVal).format('MMM DD, YYYY [at] hh:mm a')
+      get: (createdAtVal) =>
+        moment(createdAtVal).format("MMM DD, YYYY [at] hh:mm a"),
     },
     username: {
       type: String,
-      required: true
+      required: true,
     },
-    reactions: [ReactionSchema]  // use Reaction Schema to validate data for a reply
+    reactions: [ReactionSchema], // use Reaction Schema to validate data for a reply
   },
   {
     toJSON: {
       virtuals: true,
-      getters: true
+      getters: true,
     },
-    id: false
+    id: false,
   }
 );
 
 // get total count of reactions on retrieval
-ThoughtSchema.virtual('reactionCount').get(function() {
+ThoughtSchema.virtual("reactionCount").get(function () {
   return this.reactions.length;
-})
+});
 
-const Thought = model('Thought', ThoughtSchema);
+const Thought = model("Thought", ThoughtSchema);
 
 module.exports = Thought;

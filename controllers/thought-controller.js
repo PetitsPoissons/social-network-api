@@ -1,10 +1,10 @@
-const { Thought, User } = require("../models");
+const { Thought, User } = require('../models');
 
 const thoughtController = {
   // get all thoughts - GET /api/thoughts
   getAllThoughts(req, res) {
     Thought.find({})
-      .select("-__v")
+      .select('-__v')
       .sort({ _id: -1 }) // sort by most date of creation, descending
       .then((dbThoughtData) => res.json(dbThoughtData))
       .catch((err) => {
@@ -16,10 +16,10 @@ const thoughtController = {
   // get one thought by id - GET /api/thoughts/:id
   getThoughtById({ params }, res) {
     Thought.findOne({ _id: params.id })
-      .select("-__v")
+      .select('-__v')
       .then((dbThoughtData) => {
         if (!dbThoughtData) {
-          res.status(404).json({ message: "No thought found with this id" });
+          res.status(404).json({ message: 'No thought found with this id' });
           return;
         }
         res.json(dbThoughtData);
@@ -40,11 +40,11 @@ const thoughtController = {
           { _id: body.userId },
           { $push: { thoughts: _id } },
           { new: true, runValidators: true } // b/c we want to return the updated user data
-        ).select("-__v");
+        ).select('-__v');
       })
       .then((dbUserData) => {
         if (!dbUserData) {
-          res.status(404).json({ message: "No user found with this id" });
+          res.status(404).json({ message: 'No user found with this id' });
           return;
         }
         res.json(dbUserData);
@@ -59,10 +59,10 @@ const thoughtController = {
       { $push: { reactions: body } },
       { new: true, runValidators: true }
     )
-      .select("-__v")
+      .select('-__v')
       .then((dbThoughtData) => {
         if (!dbThoughtData) {
-          res.status(404).json({ message: "No thought found with this id" });
+          res.status(404).json({ message: 'No thought found with this id' });
           return;
         }
         res.json(dbThoughtData);
@@ -77,7 +77,7 @@ const thoughtController = {
       { $pull: { reactions: { reactionId: params.reactionId } } },
       { new: true, runValidators: true }
     )
-      .select("-__v")
+      .select('-__v')
       .then((dbThoughtData) => res.json(dbThoughtData))
       .catch((err) => res.json(err));
   },
@@ -88,10 +88,10 @@ const thoughtController = {
       new: true,
       runValidators: true,
     })
-      .select("-__v")
+      .select('-__v')
       .then((dbThoughtData) => {
         if (!dbThoughtData) {
-          res.status(404).json({ message: "No user found with this id" });
+          res.status(404).json({ message: 'No user found with this id' });
           return;
         }
         res.json(dbThoughtData);
@@ -100,24 +100,24 @@ const thoughtController = {
   },
 
   // remove thought
-  removeThought({ params }, res) {
-    Thought.findOneAndDelete({ _id: params.thoughtId }) // delete thought in Thought collection
+  removeThought({ params, body }, res) {
+    Thought.findOneAndDelete({ _id: params.id }) // delete thought in Thought collection
       .then((deletedThought) => {
         // pass out the deleted thought to be able to update the array of thoughts of the associated user
         if (!deletedThought) {
           return res
             .status(404)
-            .json({ message: "No thought found with this id" });
+            .json({ message: 'No thought found with this id' });
         }
         return User.findOneAndUpdate(
-          { _id: params.userId },
-          { $pull: { thoughts: params.thoughtId } },
+          { _id: body.userId },
+          { $pull: { thoughts: params.id } },
           { new: true, runValidators: true }
-        ).select("-__v");
+        ).select('-__v');
       })
       .then((dbUserData) => {
         if (!dbUserData) {
-          res.status(404).json({ message: "No user found with this id" });
+          res.status(404).json({ message: 'No user found with this id' });
           return;
         }
         res.json(dbUserData);
